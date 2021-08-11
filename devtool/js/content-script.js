@@ -3,7 +3,6 @@ chrome.runtime.sendMessage({ action: "visit", value: window.location.href });
 const whenSelected = function () {
   const target = this;
   const reference = getBestDOMReference(target);
-  console.log("changed!!", target, reference);
   if (reference) {
     chrome.runtime.sendMessage({ action: "select", reference, value: target.value });
   }
@@ -21,7 +20,6 @@ document.addEventListener(
     const isSVG = target.closest("svg");
     const isMultiSelect = false; //checkIsMultiSelect(target);
     const isSelectControl = target.localName === "select";
-    console.log("isSelectControl", isSelectControl);
     if (isSVG) {
       const g = target.closest("g[id]");
       if (g) {
@@ -124,10 +122,12 @@ function getBestDOMReference(target, reference = "") {
     `${target.localName}:contains("${target.innerHTML.trim()}")`,
     target
   );
-  reference ||= isBestSelector(
-    `${target.localName}[title="${target.getAttribute("title")}"]`,
-    target
-  );
+  if (target.getAttribute("title")) {
+    reference ||= isBestSelector(
+      `${target.localName}[title="${target.getAttribute("title")}"]`,
+      target
+    );
+  }
   if (!reference && target.parentNode) {
     reference = getBestDOMReference(target.parentNode);
   }
